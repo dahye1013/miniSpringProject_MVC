@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardSQL">
+
+	<insert parameterType="java.util.Map" id="boardWrite">
+		INSERT INTO board(seq,id,name,email,subject,content,ref)
+		values(seq_board.nextval,
+		#{id},
+		#{name},
+		#{email},
+		#{subject},
+		#{content},
+		seq_board.currval)
+	</insert>
+
+
+	<!-- 글목록 -->
+	<select id="boardList" resultType="board"
+		parameterType="java.util.Map">
+		 <![CDATA[
+		  	select * from (select rownum rn, tt.* 
+		  	from (select * from board order by ref desc, step asc)tt) 
+		  	where rn >= ${startNum} and rn <= ${endNum}
+		  	]]>
+	</select>
+
+	<!-- 총 글수 -->
+	<select id="getBoardTotalA" resultType="int">
+		select count(*) from
+		board
+	</select>
+
+	<!-- 글 찾기 -->
+	<select id="searchList" resultType="board" parameterType="java.util.Map">
+		select * from (select rownum rn, tt.* from(select *from
+		board where ${searchOption} like '%'||#{keyword}||'%'
+		order by seq desc )tt )where rn between ${startNum} and ${endNum}
+	</select>
+	<select id="getBoardSearchTotalA" resultType="int" parameterType="java.util.Map">
+		select count(*) from
+		(select * from board
+		where ${searchOption} like '%'||#{keyword}||'%' order by 1 desc)tt
+	</select>
+	
+	<!-- 작성한 글 확인 -->
+	<select id="getBoard" resultType="board" parameterType="int">
+		select*from board where seq=#{seq}
+	</select>
+
+   <insert id="boardReply" parameterType="java.util.Map">
+    begin
+         update board set step=step+1 where ref = #{ref} and step>#{step};
+
+       insert into board values(seq_board.nextval
+                           ,#{id}
+                            ,#{name}
+                            ,#{email}
+                           ,#{subject}
+                           ,#{content}
+                           ,#{ref} <!-- 원글 ref -->
+                           ,#{lev}+1 <!-- 원글 lev+1-->
+                           ,#{step}+1 <!-- 원글 step+1 -->
+                           ,#{pseq}
+                           ,0
+                           ,0
+                           ,sysdate);
+
+         update board set reply=reply+1 where seq = #{pseq};
+      end;
+    </insert>
+    
+    <!-- 글 수정 -->
+	<update id="boardModify" parameterType="java.util.Map">
+		update board set subject=#{subject} , content=#{content} where seq=${seq}
+	</update>
+	
+	<!-- 글 삭제 -->
+	<delete id="boardDelete" parameterType="int" >
+     begin
+        update board set reply=reply-1 where seq=(select pseq from board where seq=#{seq});
+        update board set subject='[원글이 삭제된 답글] '||subject where pseq=#{seq};
+        delete board where seq=#{seq};
+     end;
+    </delete>	
+    
+	<!-- 조회수 증가 -->
+	<update id="updateHit" parameterType="int">
+		update board set hit=hit+1 where seq=${seq}
+	</update>
+
+
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

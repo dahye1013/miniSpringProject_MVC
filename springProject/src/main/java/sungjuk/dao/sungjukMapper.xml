@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sungjukSQL">
+
+	
+	<insert id="write" parameterType="sungjuk">
+			insert into SUNGJUK values(
+			SEQ_SUNGJUK.nextval,
+			#{name},
+			#{kor},
+			#{eng},
+			#{math},
+			#{tot},
+			#{avg})
+	</insert>
+
+  	<select id="getList" resultType="sungjuk" >
+	select*from SUNGJUK order by '총점' desc
+	</select>
+</mapper>

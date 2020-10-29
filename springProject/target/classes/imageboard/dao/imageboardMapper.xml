@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="imageboardSQL">
+
+	<!-- 이미지 등록 -->
+	<insert id="imageboardWrite" parameterType="imageboard">	
+	insert into imageboard values(seq_imageboard.nextval,
+										#{imageId},
+										#{imageName},
+										#{imagePrice},
+										#{imageQty},
+										#{imageContent},
+										#{image1},
+										sysdate,
+										#{image2}
+										)
+	</insert>
+	
+	<!-- 이미지 리스트 -->
+ 	<select id="getImageboardList" resultType="imageboard" parameterType="java.util.Map">
+	 <![CDATA[
+	  	select * from (select rownum rn, tt.* 
+	  	from (select * from imageboard order by seq desc)tt) 
+	  	where rn >= ${startNum} and rn <= ${endNum}
+	  	]]>
+	</select>
+	
+	<!-- 총글수  -->
+	<select id="getTotalA" resultType="int">
+		select count(*) from imageboard
+	</select>
+	
+	 <delete id="imageboardDelete" parameterType="int" >
+        delete imageboard where seq=#{seq}
+    </delete>	
+    
+    <delete id="imageboardDeleteA" parameterType="java.util.Map" >
+        delete imageboard where seq in
+        <foreach collection="array" item="item" index="i" open="(" close=")" separator=",">
+        	${item}
+<!--         	${array[i]} -->
+        </foreach>
+        
+    </delete>	
+    
+
+  	<!-- 글 보기 -->
+	<select id="ImageboardView" resultType="imageboard" parameterType="int">
+		select * from imageboard where seq=${seq}
+	</select>
+  
+  
+  
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

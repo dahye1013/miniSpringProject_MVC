@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberSQL">
+
+	<select id="loginMember" resultType="member" parameterType="java.util.Map">
+			select * from member where id=#{id} and pwd=#{pwd}
+	</select>
+	<!-- 아이디 중복체크 -->
+	<select id="checkId" parameterType="String" resultType="member">
+		select*from member where id=#{id}
+	</select>
+	
+	<select id="zipcodeList" resultType="member.bean.ZipcodeDTO" parameterType="java.util.Map">
+	 select * from newzipcode
+	  where sido like '%'||#{sido}||'%'
+	  and nvl(sigungu,'0') like '%'||#{sigungu}||'%'
+	  and roadname like '%'||#{roadname}||'%'
+	</select>	
+	
+	<insert id="write" parameterType="member">
+			insert into member values(#{name},
+			#{id},
+			#{pwd},
+			#{gender},
+			#{email1},
+			#{email2},
+			#{tel1},
+			#{tel2},
+			#{tel3},
+			#{zipcode},
+			#{addr1},
+			#{addr2},
+			SYSDATE)
+	</insert>
+	
+	<!-- 회원정보수정 -->
+	<update id="modify" parameterType="member">
+  		UPDATE member SET name=#{name }
+  						, pwd=#{pwd }
+  						, gender=#{gender }
+  						, email1=#{email1 }
+  						, email2=#{email2 }
+  						, tel1=#{tel1 }
+  						, tel2=#{tel2 }
+  						, tel3=#{tel3 }
+  						, zipcode=#{zipcode }
+  						, addr1=#{addr1 }
+  						, addr2=#{addr2 }
+  						, logtime=SYSDATE
+     	WHERE id=#{id}
+  	</update>
+  	
+</mapper>
